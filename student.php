@@ -3,7 +3,7 @@
 // Autoload PSR-4
 spl_autoload_register();
 
-// Imports 
+// Imports
 use \Classes\Webforce3\Config\Config;
 use \Classes\Webforce3\Friendliness;
 use \Classes\Webforce3\DB\Student;
@@ -84,6 +84,8 @@ if (!empty($_POST)) {
 		$studentBirthdate,
 		$studentFriendliness
 	);
+
+	var_dump($studentObject);
 
 	// Si tout est ok
 	if (!$conf->haveError()) {
