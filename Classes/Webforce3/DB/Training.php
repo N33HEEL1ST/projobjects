@@ -3,9 +3,8 @@
 namespace Classes\Webforce3\DB;
 
 use Classes\Webforce3\Config\Config;
-use Classes\Webforce3\Exceptions\InvalidSqlQueryException;
 
-class Country extends DbObject {
+class Training extends DbObject {
     
     /** @var string */
     protected $name;
@@ -16,12 +15,12 @@ class Country extends DbObject {
         parent::__construct($id, $inserted);
     }
     
-    public function saveDB() {
+        public function saveDB() {
         if ($this->id > 0) {
             $sql = '
-				UPDATE country
-				SET cou_name = :name
-				WHERE cou_id = :id
+				UPDATE training
+				SET tra_name = :name
+				WHERE tra_id = :id
 			';
             $stmt = Config::getInstance()->getPDO()->prepare($sql);
             $stmt->bindValue(':id', $this->id, \PDO::PARAM_INT);
@@ -34,7 +33,7 @@ class Country extends DbObject {
             }
         } else {
             $sql = '
-				INSERT INTO country (cou_name)
+				INSERT INTO training (tra_name)
 				VALUES (:name)
 			';
             $stmt = Config::getInstance()->getPDO()->prepare($sql);
@@ -53,7 +52,7 @@ class Country extends DbObject {
 
     public static function deleteById($id) {
         $sql = '
-			DELETE FROM country WHERE cou_id = :id
+			DELETE FROM training WHERE tra_id = :id
 		';
         $stmt = Config::getInstance()->getPDO()->prepare($sql);
         $stmt->bindValue(':id', $id, \PDO::PARAM_INT);
@@ -68,10 +67,10 @@ class Country extends DbObject {
 
     public static function get($id) {
         $sql = '
-			SELECT cou_id, cou_name
-			FROM country
-			WHERE cou_id = :id
-			ORDER BY cou_name ASC
+			SELECT tra_id, tra_name
+			FROM training
+			WHERE tra_id = :id
+			ORDER BY tra_name ASC
 		';
         $stmt = Config::getInstance()->getPDO()->prepare($sql);
         $stmt->bindValue(':id', $id, \PDO::PARAM_INT);
@@ -81,8 +80,8 @@ class Country extends DbObject {
         } else {
             $row = $stmt->fetch(\PDO::FETCH_ASSOC);
             if (!empty($row)) {
-                $currentObject = new City(
-                        $row['cou_id'], $row['cou_name']
+                $currentObject = new Training(
+                        $row['tra_id'], $row['tra_name']
                 );
                 return $currentObject;
             }
@@ -99,10 +98,10 @@ class Country extends DbObject {
         $returnList = array();
 
         $sql = '
-			SELECT cou_id, cou_name
-			FROM country
-			WHERE cou_id > 0
-			ORDER BY cou_name ASC
+			SELECT tra_id, tra_name
+			FROM training
+			WHERE tra_id > 0
+			ORDER BY tra_name ASC
 		';
         $stmt = Config::getInstance()->getPDO()->prepare($sql);
         if ($stmt->execute() === false) {
@@ -110,7 +109,7 @@ class Country extends DbObject {
         } else {
             $allDatas = $stmt->fetchAll(\PDO::FETCH_ASSOC);
             foreach ($allDatas as $row) {
-                $returnList[$row['cou_id']] = $row['cou_name'];
+                $returnList[$row['tra_id']] = $row['tra_name'];
             }
         }
 

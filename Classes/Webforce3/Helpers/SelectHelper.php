@@ -5,45 +5,47 @@ namespace Classes\Webforce3\Helpers;
 use \Classes\Webforce3\Config\Config;
 
 class SelectHelper {
-	private $valuesList;
-	private $selectedValue;
-	private $attributesList;
 
-	public function __construct($valuesList, $selectedValue=0, $attributesList=array()) {
-		$this->valuesList = $valuesList;
-		$this->selectedValue = $selectedValue;
-		$this->attributesList = $attributesList;
-	}
+    private $valuesList;
+    private $selectedValue;
+    private $attributesList;
 
-	/**
-	 * @return int
-	 */
-	public function getSelectedValue() {
-		return $this->selectedValue;
-	}
+    public function __construct($valuesList, $selectedValue = 0, $attributesList = array()) {
+        $this->valuesList = $valuesList;
+        $this->selectedValue = $selectedValue;
+        $this->attributesList = $attributesList;
+    }
 
-	/**
-	 * @param int $selectedValue
-	 */
-	public function setSelectedValue($selectedValue) {
-		$this->selectedValue = $selectedValue;
-	}
+    /**
+     * @return int
+     */
+    public function getSelectedValue() {
+        return $this->selectedValue;
+    }
 
-	public function getHTML() {
-		// Get Config singleton
-		$config = Config::getInstance();
+    /**
+     * @param int $selectedValue
+     */
+    public function setSelectedValue($selectedValue) {
+        $this->selectedValue = $selectedValue;
+    }
 
-		// Generate varaibles for view
-		$selectValues = $this->valuesList;
-		$selectedValue = $this->selectedValue;
-		$attributesList = $this->attributesList;
+    public function getHTML() {
+        // Get Config singleton
+        $config = Config::getInstance();
+
+        // Generate varaibles for view
+        $selectValues = $this->valuesList;
+        $selectedValue = $this->selectedValue;
+        $attributesList = $this->attributesList;
 
         ob_start();
-		include $config->getViewsDir().'select.php';
+        include $config->getViewsDir() . 'select.php';
         return ob_get_clean();
-	}
+    }
 
-	public function displayHTML() {
-		echo $this->getHTML();
-	}
+    public function displayHTML() {
+        echo $this->getHTML();
+    }
+
 }

@@ -9,8 +9,7 @@ use \Classes\Webforce3\Config\Config;
 // Get the config object
 $conf = Config::getInstance();
 
-
 // Views
-require $conf->getViewsDir().'header.php';
-require $conf->getViewsDir().'home.php';
-require $conf->getViewsDir().'footer.php';
+require $conf->getViewsDir() . 'header.php';
+require $conf->getViewsDir() . 'home.php';
+require $conf->getViewsDir() . 'footer.php';

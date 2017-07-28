@@ -3,59 +3,38 @@
 namespace Classes\Webforce3\DB;
 
 use Classes\Webforce3\Config\Config;
+use Classes\Webforce3\Exceptions\InvalidSqlQueryException;
 
 class City extends DbObject {
-
-    /** @var Country */
-    protected $country;
 
     /** @var string */
     protected $name;
 
-    public function __construct($id = 0, $country = null, $name = '', $inserted = '') {
-        parent::__construct($id, $inserted);
+    /** @var Country */
+    protected $country;
 
+    public function __construct($id = 0, $name = '', $country = null, $inserted = '') {
         if (empty($country)) {
-			$this->country = new Country();
-		}
-		else {
-			$this->country = $country;
-		}
-        $this->name = $name;
-    }
-
-    /**
-     * 
-     * @return Country
-     */
-    public function getCountry() {
-        return $this->country;
-    }
-
-    public function getName() {
-        return $this->name;
-    }
-
-    /**
-     * 
-     * @param Country $country
-     */
-    public function setCountry($country) {
-        // Je vérifie le type de la donnée fournie
-        if (is_a($country, 'Country')) {
+            $this->country = new Country();
+        } else {
             $this->country = $country;
         }
+        $this->name = $name;
+
+        parent::__construct($id, $inserted);
     }
 
     /**
      * @param int $id
-     * @return DbObject
+     * @return bool|City
+     * @throws InvalidSqlQueryException
      */
     public static function get($id) {
         $sql = '
-			SELECT cit_id, cit_name, cit_inserted, country_cou_id
+			SELECT cit_id, cit_name, country_cou_id
 			FROM city
 			WHERE cit_id = :id
+			ORDER BY cit_name ASC
 		';
         $stmt = Config::getInstance()->getPDO()->prepare($sql);
         $stmt->bindValue(':id', $id, \PDO::PARAM_INT);
@@ -66,9 +45,7 @@ class City extends DbObject {
             $row = $stmt->fetch(\PDO::FETCH_ASSOC);
             if (!empty($row)) {
                 $currentObject = new City(
-                        $row['cit_id'],
-                        //new Country($row['country_cou_id']),
-                        Country::get($row['country_cou_id']), $row['cit_name'], $row['cit_inserted']
+                        $row['cit_id'], $row['cit_name'], new Country($row['country_cou_id'])
                 );
                 return $currentObject;
             }
@@ -81,7 +58,28 @@ class City extends DbObject {
      * @return DbObject[]
      */
     public static function getAll() {
-        // TODO
+        $returnList = array();
+
+        $sql = '
+			SELECT cit_id, cit_name
+			FROM city
+			WHERE cit_id > 0
+			ORDER BY cit_name ASC
+		';
+        $stmt = Config::getInstance()->getPDO()->prepare($sql);
+        if ($stmt->execute() === false) {
+            throw new InvalidSqlQueryException($sql, $stmt);
+        } else {
+            $allDatas = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+            foreach ($allDatas as $row) {
+                $currentObject = new City(
+                        $row['cit_id'], $row['cit_name']
+                );
+                $returnList[] = $currentObject;
+            }
+        }
+
+        return $returnList;
     }
 
     /**
@@ -117,34 +115,31 @@ class City extends DbObject {
             $sql = '
 				UPDATE city
 				SET cit_name = :name,
-                    country_cou_id = :countryID
+				country_cou_id = :couId
 				WHERE cit_id = :id
 			';
             $stmt = Config::getInstance()->getPDO()->prepare($sql);
             $stmt->bindValue(':id', $this->id, \PDO::PARAM_INT);
-            $stmt->bindValue(':countryID', $this->getCountry()->getId(), \PDO::PARAM_INT);
+            $stmt->bindValue(':couId', $this->country->id, \PDO::PARAM_INT);
             $stmt->bindValue(':name', $this->name);
 
             if ($stmt->execute() === false) {
                 throw new InvalidSqlQueryException($sql, $stmt);
-            }
-            else {
+            } else {
                 return true;
             }
-        }
-        else {
+        } else {
             $sql = '
 				INSERT INTO city (cit_name, country_cou_id)
-				VALUES (:name, :countryID)
+				VALUES (:name, :couId)
 			';
             $stmt = Config::getInstance()->getPDO()->prepare($sql);
-            $stmt->bindValue(':countryID', $this->getCountry()->getId(), \PDO::PARAM_INT);
+            $stmt->bindValue(':couId', $this->country->id, \PDO::PARAM_INT);
             $stmt->bindValue(':name', $this->name);
 
             if ($stmt->execute() === false) {
                 throw new InvalidSqlQueryException($sql, $stmt);
-            }
-            else {
+            } else {
                 $this->id = Config::getInstance()->getPDO()->lastInsertId();
                 return true;
             }
@@ -158,7 +153,26 @@ class City extends DbObject {
      * @return bool
      */
     public static function deleteById($id) {
-        return self::deleteFromId($id, 'city', 'cit_id');
+        $sql = '
+			DELETE FROM city WHERE cit_id = :id
+		';
+        $stmt = Config::getInstance()->getPDO()->prepare($sql);
+        $stmt->bindValue(':id', $id, \PDO::PARAM_INT);
+
+        if ($stmt->execute() === false) {
+            print_r($stmt->errorInfo());
+        } else {
+            return true;
+        }
+        return false;
+    }
+
+    function getName() {
+        return $this->name;
+    }
+
+    function getCountry() {
+        return $this->country;
     }
 
 }

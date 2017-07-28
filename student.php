@@ -42,59 +42,51 @@ if (isset($_GET['delete']) && intval($_GET['delete']) > 0) {
 
 // Si formulaire soumis
 if (!empty($_POST)) {
-	$studentId = isset($_POST['id']) ? intval($_POST['id']) : 0;
-	$sessionId = isset($_POST['ses_id']) ? intval($_POST['ses_id']) : 0;
-	$cityId = isset($_POST['cit_id']) ? intval($_POST['cit_id']) : 0;
-	$studentBirthdate = isset($_POST['stu_birthdate']) ? date('Y-m-d', strtotime($_POST['stu_birthdate'])) : 0;
-	$studentFriendliness = isset($_POST['stu_friendliness']) ? intval($_POST['stu_friendliness']) : 0;
-	$studentLastName = isset($_POST['stu_lname']) ? trim($_POST['stu_lname']) : '';
-	$studentFirstName = isset($_POST['stu_fname']) ? trim($_POST['stu_fname']) : '';
-	$studentEmail = isset($_POST['stu_email']) ? trim($_POST['stu_email']) : '';
+    $studentId = isset($_POST['id']) ? intval($_POST['id']) : 0;
+    $sessionId = isset($_POST['ses_id']) ? intval($_POST['ses_id']) : 0;
+    $cityId = isset($_POST['cit_id']) ? intval($_POST['cit_id']) : 0;
+    $studentBirthdate = isset($_POST['stu_birthdate']) ? date('Y-m-d', strtotime($_POST['stu_birthdate'])) : 0;
+    $studentFriendliness = isset($_POST['stu_friendliness']) ? intval($_POST['stu_friendliness']) : 0;
+    $studentLastName = isset($_POST['stu_lname']) ? trim($_POST['stu_lname']) : '';
+    $studentFirstName = isset($_POST['stu_fname']) ? trim($_POST['stu_fname']) : '';
+    $studentEmail = isset($_POST['stu_email']) ? trim($_POST['stu_email']) : '';
 
-	if (strlen($studentBirthdate) < 10) {
-		$conf->addError('Birthdate non correcte');
-	}
-	if (!array_key_exists($studentFriendliness, $friendlinessList)) {
-		$conf->addError('Sympathie non valide');
-	}
-	if (!array_key_exists($cityId, $citiesList)) {
-		$conf->addError('Ville non valide');
-	}
-	if (!array_key_exists($sessionId, $sessionsList)) {
-		$conf->addError('Session de formation non valide');
-	}
-	if (empty($studentEmail) || filter_var($studentEmail, FILTER_VALIDATE_EMAIL) === false) {
-		$conf->addError('Email non valide');
-	}
-	if (empty($studentLastName)) {
-		$conf->addError('Veuillez renseigner le nom');
-	}
-	if (empty($studentFirstName)) {
-		$conf->addError('Veuillez renseigner le prénom');
-	}
+    if (strlen($studentBirthdate) < 10) {
+        $conf->addError('Birthdate non correcte');
+    }
+    if (!array_key_exists($studentFriendliness, $friendlinessList)) {
+        $conf->addError('Sympathie non valide');
+    }
+    if (!array_key_exists($cityId, $citiesList)) {
+        $conf->addError('Ville non valide');
+    }
+    if (!array_key_exists($sessionId, $sessionsList)) {
+        $conf->addError('Session de formation non valide');
+    }
+    if (empty($studentEmail) || filter_var($studentEmail, FILTER_VALIDATE_EMAIL) === false) {
+        $conf->addError('Email non valide');
+    }
+    if (empty($studentLastName)) {
+        $conf->addError('Veuillez renseigner le nom');
+    }
+    if (empty($studentFirstName)) {
+        $conf->addError('Veuillez renseigner le prénom');
+    }
 
-	// je remplis l'objet qui est lu pour les inputs du formulaire, ou pour l'ajout en DB
-	$studentObject = new Student(
-		$studentId,
-		new Session($sessionId),
-		new City($cityId),
-		$studentLastName,
-		$studentFirstName,
-		$studentEmail,
-		$studentBirthdate,
-		$studentFriendliness
-	);
+    // je remplis l'objet qui est lu pour les inputs du formulaire, ou pour l'ajout en DB
+    $studentObject = new Student(
+            $studentId, new Session($sessionId), new City($cityId), $studentLastName, $studentFirstName, $studentEmail, $studentBirthdate, $studentFriendliness
+    );
 
-	// Si tout est ok
-	if ($conf->haveError() === false) {
-		if ($studentObject->saveDB()) {
-			header('Location: student.php?success='.urlencode('Ajout/Modification effectuée').'&stu_id='.$studentObject->getId());
-			exit;
-		}
-		else {
-			$conf->addError('Erreur dans l\'ajout ou la modification');
-		}
-	}
+    // Si tout est ok
+    if (!$conf->haveError()) {
+        if ($studentObject->saveDB()) {
+            header('Location: student.php?success=' . urlencode('Ajout/Modification effectuée') . '&stu_id=' . $studentObject->getId());
+            exit;
+        } else {
+            $conf->addError('Erreur dans l\'ajout ou la modification');
+        }
+    }
 }
 
 // Instancie le générateur de menu déroulant pour la sympathie
