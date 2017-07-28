@@ -78,4 +78,20 @@ abstract class DbObject {
 	public function getInserted() {
 		return $this->inserted;
 	}
+    
+    public static function deleteFromId($id, $tableName, $idFieldName) {
+        $sql = '
+			DELETE FROM '.$tableName.' WHERE '.$idFieldName.' = :id
+		';
+		$stmt = Config::getInstance()->getPDO()->prepare($sql);
+		$stmt->bindValue(':id', $id, \PDO::PARAM_INT);
+
+		if ($stmt->execute() === false) {
+			print_r($stmt->errorInfo());
+		}
+		else {
+			return true;
+		}
+		return false;
+    }
 }

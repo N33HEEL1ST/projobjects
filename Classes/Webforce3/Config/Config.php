@@ -141,4 +141,11 @@ class Config {
 	public function haveError() {
 		return sizeof($this->errorList) > 0;
 	}
+
+	/**
+	 * @return bool
+	 */
+	public function doesNotHaveError() {
+		return !$this->haveError();
+	}
 }

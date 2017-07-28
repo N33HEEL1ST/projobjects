@@ -3,7 +3,7 @@
 // Autoload PSR-4
 spl_autoload_register();
 
-// Imports
+// Imports 
 use \Classes\Webforce3\Config\Config;
 use \Classes\Webforce3\Friendliness;
 use \Classes\Webforce3\DB\Student;
@@ -85,10 +85,8 @@ if (!empty($_POST)) {
 		$studentFriendliness
 	);
 
-	var_dump($studentObject);
-
 	// Si tout est ok
-	if (!$conf->haveError()) {
+	if ($conf->haveError() === false) {
 		if ($studentObject->saveDB()) {
 			header('Location: student.php?success='.urlencode('Ajout/Modification effectuée').'&stu_id='.$studentObject->getId());
 			exit;
